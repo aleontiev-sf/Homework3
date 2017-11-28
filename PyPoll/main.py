@@ -26,20 +26,29 @@ with open(election_csv, newline="") as csvfile:
       candidates[row[2]] = 1  #     initialize her/his vote to 1
 total_votes = csvreader.line_num - 1  # Total number of votes is the number of lines 
                                       #    in input file minus 1 (header line)
+print ("Election Resuls\n")
+print ("--------------------------\n")
 print ("Total Votes: " + str(total_votes))
+print ("\n--------------------------\n")
 for key, value in candidates.items(): # This loop prints voting results for each candidate
                                       #  key is candidate name, value is the vote count
   print (key + ": " + "{0:.1f}%".format(value/total_votes * 100) + 
          " (" + str(value) + ")")
+print ("\n--------------------------\n")
 print ("Winner: " + max(candidates, key=candidates.get) ) # determine the winner using 
-                                                          #    max method 
+print ("\n--------------------------")                                                          #    max method 
 # Now output same results to the output file
 # NOTE: the output file is overwritten; if its contents are needed, either
 #       save its contents to another file OR change the name of the output file below
 output_path = os.path.join('Resources', 'Election_results_2.txt')
 with open(output_path, 'w') as f:
+  f.write ("Election Resuls\n")
+  f.write ("--------------------------\n")
   f.write("Total Votes: " + str(total_votes) + '\n')
+  f.write ("\n--------------------------\n")
   for key, value in candidates.items():
     f.write(key + ": " + "{0:.1f}%".format(value/total_votes * 100) + 
             " (" + str(value) + ")\n")
+  f.write ("\n--------------------------\n")
   f.write("Winner: " + max(candidates, key=candidates.get) + '\n')
+  f.write ("\n--------------------------")
