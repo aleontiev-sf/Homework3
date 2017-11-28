@@ -9,7 +9,7 @@
 # Import various dependencies (libraries)
 import os
 import csv
-budget_csv = os.path.join("Resources", "budget_data2.csv") # Set the path for the input file
+budget_csv = os.path.join("Resources", "budget_data1.csv") # Set the path for the input file
 with open(budget_csv, newline="") as csvfile:              # Open and read the csv file
     csvreader = csv.reader(csvfile, delimiter=",")
     next(csvreader) # skip over the first line (header)
@@ -55,7 +55,7 @@ with open(budget_csv, newline="") as csvfile:              # Open and read the c
 # Now output the same analysis to the output file
 # NOTE: the output file is overwritten; if its contents are needed, either
 #       save its contents to another file OR change the name of the output file below
-output_path = os.path.join('Resources', 'Financial_Analysis_2.txt')
+output_path = os.path.join('Resources', 'Financial_Analysis_1.txt')
 with open(output_path, 'w') as f:
     f.write("Financial Analysis\n")
     f.write("----------------------------\n")
