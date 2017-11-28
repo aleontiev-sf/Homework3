@@ -1,22 +1,21 @@
-# This python script reads an input file, in a subdirectory called Resrouces, 
-#   containing voting results.
-# After processing all the input data, it prints the total number of votes, the percentage 
-#   of votes and total votes for each candidate, as well as the overall winner.
-# Data in the input file are in csv format and comprised of three columns (all strings): 
-#   voter ID, county and candidate.
-# Input data (rows) are assumed to be unique (no duplicates) and contiguous (no gaps).
-# To process a different file, change the input file name in line 18.
-# Results are also saved in an output file in the Resources subdirectory.
-# NOTE: the output file is overwritten; if its contents are needed, either
-#       save its contents to another file OR change the name of the output file. 
+# This python script reads an input csv file, in a subdirectory called Resrouces, 
+#   containing employee data, transforms various fields and produces an output csv
+#   file, in the Resources subdirectory.
+# Data in the input file are in csv format and comprised of five fields (all strings): 
+#   ID, full name, date of birth (YYYY-MM-DD), SSN (all digits), state (full name).
+# To process a different file, change the input file name in line 34.
+# The script produces an output csv file comprised of six fields (all strings):
+#   ID, first name, last name, date of birth (DD/MM/YYYY), SSN (masked), state (abbreviated).
+# NOTE: the output file is overwritten; if its contents are needed, either save
+#   the contents to another file OR change the name of the output file in line 60.
 #
 # Dependencies
 import os
 import csv
-import string
+import re
 import datetime
 from datetime import datetime
-state_abbr = {      # dictionary indexed by full name, value 2 letter abbreviation
+state_abbr = {      # State abbreviation dictionary: key is state full name, value is two-letter abbreviation
     'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR',
     'California': 'CA', 'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE',
     'Florida': 'FL', 'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID', 
@@ -30,32 +29,42 @@ state_abbr = {      # dictionary indexed by full name, value 2 letter abbreviati
     'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 
     'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 
     'Wisconsin': 'WI', 'Wyoming': 'WY',}
-new_emp_dict = {}  # Declare an empty dictionary which will contain transfomred records
-employee_csv = os.path.join("Resources", "employee_data1.csv")
-# Open and read csv
+new_emp_dict = [] # Declare an empty list which will contain all transfomred records
+# Create the path for the input file, open it and read csv records
+employee_csv = os.path.join("Resources", "employee_data2.csv")
 with open(employee_csv, newline="") as csvfile:
     csvreader = csv.reader(csvfile, delimiter=",")
-    next(csvreader) # skip over the first line (header)
+    next(csvreader) # Skip over the first line (header)
     # Iterate throught each row/line of data in the input file
     for row in csvreader:
-        # Store various fields in input rows into variables for subsqequent transformation
+        # Store various fields in the input row into variables for subsqequent transformation
         emp_id = str(row[0])
         emp_name = row[1]
         emp_dob = row[2]
         emp_ssn = row[3]
         emp_state = row[4]
-        # Start transformations of the name, DOB, SSN masking and state abbreviation
-        first_name,last_name = emp_name.split()
-        date_obj = datetime.strptime(emp_dob,'%Y-%m-%d') # Input date format YYYY-MM-DD
-        new_date = date_obj.strftime('%d/%m/%Y')         # Output format DD/MM/YYYY
-        ssn_last4 = emp_ssn[-4:]
-        new_state = state_abbr[emp_state]
-#        print(emp_id + "," + first_name + "," + last_name + "," + new_date + 
-#          ",***-**-" + ssn_last4 + "," + new_state)
-        new_emp_dict[emp_id].append(first_name)
-        new_emp_dict[emp_id].append(last_name)
-        new_emp_dict[emp_id].append(new_date)
-        new_emp_dict[emp_id].append(ssn_last4)
-        new_emp_dict[emp_id].append(new_state)
-print("\nProcessed " + str (csvreader.line_num-1) + " records.")
+        # Start transformation of the name, DOB, SSN masking and state abbreviation
+        first_name,last_name = emp_name.split()          # Split full name into first and last name
+        date_obj = datetime.strptime(emp_dob,'%Y-%m-%d') # Save input date in an object specifying YYYY-MM-DD format
+        new_date = date_obj.strftime('%d/%m/%Y')         # Convert date object using DD/MM/YYYY format
+        ssn_last4 = emp_ssn[-4:]                         # Save last 4 SSN digits via backward slicing
+        new_ssn = "***-**-" + ssn_last4                  # Form new SSN by exposing only last 4 digits
+        new_state = state_abbr[emp_state]                # Look up abbreviated state name in dictionary
+        # Create a new row using trasnfomred fields above, and append it to the list that will
+        #    eventually contain all transformed records
+        new_rec = emp_id + "," + first_name + "," + last_name + "," + new_date + "," + new_ssn + "," + new_state
+        new_emp_dict.append(new_rec)
+# Now that all input records have been converted and saved in a list, output them to an output csv file
+# NOTE: the output file is overwritten; if its contents are needed, either save
+#   the contents to another file OR change the name of the output file below.
+output_file = os.path.join("Resources", "Converted-2.csv")
+with open (output_file, 'w') as f:
+    writer = csv.writer(f)
+    # Write the header row (titles of various fields)
+    writer.writerow(['Emp ID', 'First name', 'Last name', 'DOB', 'Masked SSN', 'State'])
+    # Output all the converted rows previosuly stored in a list
+    # Since the csv writerow method appends commas automatically to each field, remove
+    #   commas from the row (using split)
+    for i in range(len(new_emp_dict)):
+       writer.writerow(re.split(',', new_emp_dict[i]))
 
