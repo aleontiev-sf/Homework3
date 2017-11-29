@@ -1,0 +1,6 @@
+Paragraph Analysis
+------------------
+Approxiamte word count: 121
+Approximate sentence count: 5
+Approximate letter count : 4.553719008264463
+Approximate sentence length : 24.2
